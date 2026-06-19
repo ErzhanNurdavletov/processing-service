@@ -3,6 +3,7 @@ package kg.bakaibank.processingservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@ToString
 public class Account {
 
     @Id
@@ -38,6 +40,9 @@ public class Account {
     @Column(name = "account_number", nullable = false, length = 22)
     private String accountNumber;
 
-    @Column(name = "cards")
-    private Set<UUID> cards;
+    @Column(name = "balance", nullable = false)
+    private BigDecimal balance;
+
+//    @Column(name = "cards")
+//    private Set<UUID> cardsIds;
 }

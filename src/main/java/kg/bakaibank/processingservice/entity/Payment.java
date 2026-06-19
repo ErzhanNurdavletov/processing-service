@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@ToString
 public class Payment {
 
     @Id
@@ -31,7 +32,7 @@ public class Payment {
     @JoinColumn(name = "credit_account_id", nullable = false)
     private Account creditAccount;
 
-    @Column(name = "amount", scale = 15, precision = 2, nullable = false)
+    @Column(name = "amount", precision = 15, scale = 2, nullable = false)
     private BigDecimal amount;
 
     @Column(name = "currency", nullable = false)

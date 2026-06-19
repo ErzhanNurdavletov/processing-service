@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
 
     private final PaymentFacade paymentFacade;
+
     @PostMapping
     public ResponseEntity<?> executePayment(@Valid @RequestBody PaymentRequest request) {
         PaymentResponse response = paymentFacade.executePayment(request);

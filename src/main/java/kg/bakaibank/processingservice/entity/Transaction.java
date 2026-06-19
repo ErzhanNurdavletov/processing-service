@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@ToString
 public class Transaction {
 
     @Id
@@ -30,7 +31,7 @@ public class Transaction {
     @JoinColumn(name = "credit_account_id", nullable = false)
     private Account creditAccount;
 
-    @Column(name = "amount", scale = 15, precision = 2, nullable = false)
+    @Column(name = "amount", precision = 15, scale = 2, nullable = false)
     private BigDecimal amount;
 
     @Column(name = "currency", nullable = false)
@@ -38,6 +39,7 @@ public class Transaction {
     private PaymentCurrency currency;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
     @Column(name = "comment")

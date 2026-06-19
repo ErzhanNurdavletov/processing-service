@@ -2,6 +2,7 @@ package kg.bakaibank.processingservice.mapper;
 
 import kg.bakaibank.processingservice.entity.Payment;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
+import kg.bakaibank.processingservice.payload.response.PaymentResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,5 +17,14 @@ public class PaymentMapper {
             .currency(request.currency())
             .comment(request.comment())
             .build();
+    }
+
+    public PaymentResponse toResponse(Payment payment) {
+        if (payment == null) {
+            return null;
+        }
+        return new PaymentResponse(
+            payment.getId(),
+            payment.getStatus());
     }
 }

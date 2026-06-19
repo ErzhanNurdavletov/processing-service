@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record PaymentRequest(
-    UUID sourceAccountId,
-    UUID destinationAccountId,
+    UUID sourceCardId,
+    UUID destinationCardId,
     BigDecimal amount,
     PaymentCurrency currency,
     String comment
