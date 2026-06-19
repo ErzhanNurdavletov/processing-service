@@ -2,6 +2,7 @@ package kg.bakaibank.processingservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DialectOverride;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -42,7 +43,4 @@ public class Account {
 
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;
-
-//    @Column(name = "cards")
-//    private Set<UUID> cardsIds;
 }

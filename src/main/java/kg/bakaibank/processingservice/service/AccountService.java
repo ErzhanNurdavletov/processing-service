@@ -11,6 +11,7 @@ import lombok.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -36,6 +37,7 @@ public class AccountService {
     @Transactional
     public AccountResponse createAccount(AccountCreateRequest request) {
         Account account = accountMapper.toEntity(request);
+        account.setBalance(new BigDecimal(0));
         accountRepository.save(account);
         return accountMapper.toResponse(account);
     }

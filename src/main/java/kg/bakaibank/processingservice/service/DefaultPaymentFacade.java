@@ -33,18 +33,6 @@ public class DefaultPaymentFacade implements PaymentFacade {
     private final CardWebClient cardWebClient;
     private final PaymentMapper paymentMapper;
 
-
-    public void method(PaymentRequest request) {
-        RemoteCardResponse sourceCardResponse =
-            cardWebClient.getCardById(request.sourceCardId());
-        RemoteCardResponse destinationCardResponse =
-            cardWebClient.getCardById(request.destinationCardId());
-
-        checkIfCardLimitExceed(request.sourceCardId(), sourceCardResponse.accountId());
-
-
-    }
-
     @Override
     @Transactional
     public PaymentResponse executePayment(PaymentRequest request) {

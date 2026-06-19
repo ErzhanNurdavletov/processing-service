@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
-    @Query("SELECT SUM(p.amount)" +
+    @Query("SELECT COALESCE(SUM(p.amount), 0)" +
         " FROM Payment p" +
         " WHERE p.debitAccount.id = :accountId" +
         " AND p.createdAt >= :from" +
