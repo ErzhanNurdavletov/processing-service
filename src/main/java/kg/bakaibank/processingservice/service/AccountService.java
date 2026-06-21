@@ -1,13 +1,12 @@
 package kg.bakaibank.processingservice.service;
 
 import kg.bakaibank.processingservice.entity.Account;
-import kg.bakaibank.processingservice.exception.AccountNotFoundException;
+import kg.bakaibank.processingservice.exception.custom.AccountNotFoundException;
 import kg.bakaibank.processingservice.mapper.AccountMapper;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
 import kg.bakaibank.processingservice.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +23,14 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
 
+    @Transactional(readOnly = true)
     public Account findById(UUID accountId) {
         return accountRepository.findById(accountId)
             .orElseThrow(() -> new AccountNotFoundException("Account with id: "
                 + accountId + " not found"));
     }
 
+    @Transactional(readOnly = true)
     public Account getBankTransitAccount() {
         return findById(BANK_TRANSIT_ACCOUNT_ID);
     }

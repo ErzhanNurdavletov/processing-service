@@ -1,10 +1,17 @@
 package kg.bakaibank.processingservice.service;
 
+//TODO проверка лимита debit карты на количество платежей(нету)
+//TODO проверка на наличие денег
+//TODO проверка на активность двух карт
+//TODO разобраться с @Transactional в платежах
+//TODO привязывать счета к транзакциям и платежам ---
+
+
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.entity.Payment;
 import kg.bakaibank.processingservice.entity.Transaction;
-import kg.bakaibank.processingservice.exception.DefaultWithdrawalLimitNotFoundException;
-import kg.bakaibank.processingservice.exception.LimitExceededException;
+import kg.bakaibank.processingservice.entity.enums.PaymentDeclineReason;
+import kg.bakaibank.processingservice.exception.custom.DefaultTransferLimitNotFoundException;
 import kg.bakaibank.processingservice.mapper.PaymentMapper;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.PaymentResponse;
@@ -16,6 +23,7 @@ import kg.bakaibank.processingservice.webclient.payload.response.RemotePaymentPe
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -34,22 +42,33 @@ public class DefaultPaymentFacade implements PaymentFacade {
     private final PaymentMapper paymentMapper;
 
     @Override
-    @Transactional
+    @Transactional(
+        isolation = Isolation.SERIALIZABLE,
+        timeout = 15,
+        rollbackFor = Exception.class
+    )
     public PaymentResponse executePayment(PaymentRequest request) {
         RemoteCardResponse sourceCardResponse =
             cardWebClient.getCardById(request.sourceCardId());
         RemoteCardResponse destinationCardResponse =
             cardWebClient.getCardById(request.destinationCardId());
 
-        checkIfCardLimitExceed(request.sourceCardId(), sourceCardResponse.accountId());
-
         Account debitAccount = accountService.findById(sourceCardResponse.accountId());
         Account creditAccount = accountService.findById(destinationCardResponse.accountId());
+        Payment payment = paymentService.openPayment(request, debitAccount, creditAccount);
 
-        Payment payment = paymentService.initPayment(request, debitAccount, creditAccount);
+        boolean isMoneyEnough = isDebitMoneyEnough(debitAccount, request.amount());
+        boolean isLimitExceed = isCardLimitExceed(request.sourceCardId(), debitAccount.getId(), request.amount());
+        if (!isMoneyEnough) {
+            paymentService.declinePayment(payment, PaymentDeclineReason.INSUFFICIENT_FUNDS);
+            return paymentMapper.toResponse(payment);
+        }
+        if (isLimitExceed) {
+            paymentService.declinePayment(payment, PaymentDeclineReason.LIMIT_EXCEEDED);
+            return paymentMapper.toResponse(payment);
+        }
 
         Account transitAccount = accountService.getBankTransitAccount();
-
         Transaction debitToTransitTransaction =
             transactionService.initTransaction(request, debitAccount, transitAccount);
         transferMoney(debitAccount, transitAccount, request.amount());
@@ -60,7 +79,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
         transferMoney(transitAccount, creditAccount, request.amount());
         transactionService.closeTransaction(transitToCreditTransaction);
 
-        paymentService.closePayment(payment);
+        paymentService.completePayment(payment);
         return paymentMapper.toResponse(payment);
     }
 
@@ -71,24 +90,37 @@ public class DefaultPaymentFacade implements PaymentFacade {
         debit.setBalance(debitAccountNewBalance);
     }
 
-    private void checkIfCardLimitExceed(UUID cardId, UUID debitAccountId) {
+    private boolean isCardLimitExceed(UUID cardId,
+                                      UUID debitAccountId,
+                                      BigDecimal transferAmount) {
+        BigDecimal sumForToday =
+            paymentService.countTodayPaymentSum(debitAccountId).add(transferAmount);
+        int countForToday = paymentService.countTodayPayments(debitAccountId) + 1;
+
+        RemotePaymentPermissionRequest remoteRequest =
+            new RemotePaymentPermissionRequest(sumForToday, countForToday);
+
+        UUID transferLimitId = findCardTransferLimitId(cardId);
+        RemotePaymentPermissionResponse response =
+            cardWebClient.checkIfPaymentNotExceedLimit(cardId, transferLimitId, remoteRequest);
+
+        return !(response.isAllowedByAmount() && response.isAllowedByCount());
+    }
+
+    private UUID findCardTransferLimitId(UUID cardId) {
         List<RemoteCardLimitResponse> cardCurrentLimitsResponses =
             cardWebClient.getCardCurrentLimits(cardId);
 
-        RemoteCardLimitResponse withdrawalLimitResponse = cardCurrentLimitsResponses
+        RemoteCardLimitResponse transferLimitResponse = cardCurrentLimitsResponses
             .stream()
-            .filter(response -> response.limitName().equals("withdrawal-limit"))
+            .filter(response -> response.limitName().equals("transfer-limit"))
             .findFirst()
-            .orElseThrow(() -> new DefaultWithdrawalLimitNotFoundException("withdrawal-limit not found for card: " + cardId));
+            .orElseThrow(() -> new DefaultTransferLimitNotFoundException("transfer-limit not found for card: " + cardId));
 
-        UUID withdrawalLimitId = withdrawalLimitResponse.limitId();
-        BigDecimal amountForToday = paymentService.countTodayPaymentSum(debitAccountId);
-        RemotePaymentPermissionRequest remoteRequest = new RemotePaymentPermissionRequest(amountForToday);
-        RemotePaymentPermissionResponse response =
-            cardWebClient.checkIfPaymentNotExceedLimit(cardId, withdrawalLimitId, remoteRequest);
+        return transferLimitResponse.limitId();
+    }
 
-        if (!response.isAllowed()) {
-            throw new LimitExceededException("LIMIT_EXCEEDED for card: " + cardId);
-        }
+    private boolean isDebitMoneyEnough(Account debit, BigDecimal amount) {
+        return debit.getBalance().compareTo(amount) >= 0;
     }
 }

@@ -1,7 +1,9 @@
-package kg.bakaibank.processingservice.exception;
+package kg.bakaibank.processingservice.exception.custom;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public class ApplicationException extends RuntimeException {
 
     private final HttpStatus status;

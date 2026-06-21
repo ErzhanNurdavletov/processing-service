@@ -2,6 +2,7 @@ package kg.bakaibank.processingservice.entity;
 
 import jakarta.persistence.*;
 import kg.bakaibank.processingservice.entity.enums.PaymentCurrency;
+import kg.bakaibank.processingservice.entity.enums.PaymentDeclineReason;
 import kg.bakaibank.processingservice.entity.enums.PaymentStatus;
 import lombok.*;
 
@@ -48,4 +49,8 @@ public class Payment {
 
     @Column(name = "comment")
     private String comment;
+
+    @Column(name = "decline_reason")
+    @Enumerated(EnumType.STRING)
+    private PaymentDeclineReason declineReason;
 }

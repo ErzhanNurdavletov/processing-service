@@ -16,7 +16,7 @@ public class TransactionService {
     public Transaction initTransaction(PaymentRequest request,
                                        Account debitAccount,
                                        Account creditAccount) {
-        Transaction transaction = Transaction.builder()
+        return Transaction.builder()
             .debitAccount(debitAccount)
             .creditAccount(creditAccount)
             .amount(request.amount())
@@ -24,11 +24,10 @@ public class TransactionService {
             .status(TransactionStatus.NEW)
             .comment(request.comment())
             .build();
-
-        return transactionRepository.save(transaction);
     }
 
     public void closeTransaction(Transaction transaction) {
         transaction.setStatus(TransactionStatus.COMPLETED);
+        transactionRepository.save(transaction);
     }
 }

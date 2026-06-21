@@ -1,4 +1,4 @@
-package kg.bakaibank.processingservice.exception;
+package kg.bakaibank.processingservice.exception.custom;
 
 import org.springframework.http.HttpStatus;
 
