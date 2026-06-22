@@ -5,14 +5,16 @@ import kg.bakaibank.processingservice.entity.Transaction;
 import kg.bakaibank.processingservice.entity.enums.TransactionStatus;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.repository.TransactionRepository;
+import kg.bakaibank.processingservice.service.api.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class TransactionService {
+public class DefaultTransactionService implements TransactionService {
     private final TransactionRepository transactionRepository;
 
+    @Override
     public Transaction initTransaction(PaymentRequest request,
                                        Account debitAccount,
                                        Account creditAccount) {
@@ -26,6 +28,7 @@ public class TransactionService {
             .build();
     }
 
+    @Override
     public void closeTransaction(Transaction transaction) {
         transaction.setStatus(TransactionStatus.COMPLETED);
         transactionRepository.save(transaction);

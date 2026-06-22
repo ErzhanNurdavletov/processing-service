@@ -1,11 +1,9 @@
 package kg.bakaibank.processingservice.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kg.bakaibank.processingservice.exception.custom.AccountNotFoundException;
-import kg.bakaibank.processingservice.exception.custom.ApplicationException;
-import kg.bakaibank.processingservice.exception.custom.DefaultTransferLimitNotFoundException;
-import kg.bakaibank.processingservice.exception.custom.LimitExceededException;
+import kg.bakaibank.processingservice.exception.custom.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -19,6 +17,63 @@ import java.util.List;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<?> handlePropertyReferenceException(PropertyReferenceException e) {
+
+        String customMessage = "Sorting properties not valid";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(e.getMessage() + " " + e.getPropertyName())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<?> handlePaymentNotFoundException(PaymentNotFoundException e) {
+
+        String customMessage = "Payment not found";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(e.getStatus().value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, e.getStatus());
+    }
+
+    @ExceptionHandler(AccountWithClientIdExistsException.class)
+    public ResponseEntity<?> handleAccountWithClientIdExistsException(AccountWithClientIdExistsException e) {
+
+        String customMessage = "Account with this clientId exists";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(e.getStatus().value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, e.getStatus());
+    }
+
+    @ExceptionHandler(CardIsBlockedException.class)
+    public ResponseEntity<?> handleCardIsBlockedException(CardIsBlockedException e) {
+
+        String customMessage = "Card is blocked";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(e.getStatus().value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, e.getStatus());
+    }
+
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<?> handleAccountNotFoundException(AccountNotFoundException e) {

@@ -2,6 +2,7 @@ package kg.bakaibank.processingservice.mapper;
 
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
+import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
 import org.springframework.stereotype.Component;
 
@@ -23,5 +24,14 @@ public class AccountMapper {
             return null;
         }
         return new AccountResponse(account.getId());
+    }
+
+    public AccountBalanceResponse toBalanceResponse(Account account) {
+        if (account == null) {
+            return null;
+        }
+        return new AccountBalanceResponse(
+            account.getId(),
+            account.getBalance());
     }
 }
