@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -53,4 +54,7 @@ public class Payment {
     @Column(name = "decline_reason")
     @Enumerated(EnumType.STRING)
     private PaymentDeclineReason declineReason;
+
+    @OneToMany(mappedBy = "payment")
+    private Set<Transaction> transactions;
 }

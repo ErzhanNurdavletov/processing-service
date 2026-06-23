@@ -23,7 +23,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
         AND p.status IN :paymentStatuses
         AND p.createdAt >= :from
         AND p.createdAt < :to
-        """)
+""")
     BigDecimal sumAmountForTodayByAccountId(UUID accountId,
                                             OffsetDateTime from,
                                             OffsetDateTime to,
@@ -36,12 +36,40 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             AND p.status IN :paymentStatuses
             AND p.createdAt >= :from
             AND p.createdAt < :to
-    """)
+""")
     Integer countPaymentByDebitAccount(UUID debitAccountId,
                                        OffsetDateTime from,
                                        OffsetDateTime to,
                                        Set<PaymentStatus> paymentStatuses);
 
-    Page<Payment> findByDebitAccountId(UUID debitAccountId, Pageable pageable);
-    Page<Payment> findByCreditAccountId(UUID creditAccountId, Pageable pageable);
+    @Query("""
+     SELECT p
+     FROM Payment p
+     WHERE p.debitAccount.id = :debitAccountId
+     AND p.createdAt >= :from
+     AND p.createdAt < :to
+""")
+    Page<Payment> findByDebitAccountId(UUID debitAccountId, OffsetDateTime from,
+                                       OffsetDateTime to, Pageable pageable);
+
+    @Query("""
+     SELECT p
+     FROM Payment p
+     WHERE p.creditAccount.id = :creditAccountId
+     AND p.createdAt >= :from
+     AND p.createdAt < :to
+""")
+    Page<Payment> findByCreditAccountId(UUID creditAccountId, OffsetDateTime from,
+                                        OffsetDateTime to, Pageable pageable);
+
+    @Query("""
+     SELECT p
+     FROM Payment p
+     WHERE (p.debitAccount.id = :accountId
+     OR p.creditAccount.id = :accountId)
+     AND p.createdAt >= :from
+     AND p.createdAt < :to
+""")
+    Page<Payment> findByAccountId(UUID accountId, OffsetDateTime from,
+                                  OffsetDateTime to, Pageable pageable);
 }

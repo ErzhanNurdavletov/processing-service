@@ -8,8 +8,6 @@ import kg.bakaibank.processingservice.service.api.PaymentFacade;
 import kg.bakaibank.processingservice.service.api.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,20 +34,6 @@ public class PaymentController {
     public ResponseEntity<?> findById(@PathVariable UUID paymentId) {
         PaymentResponse response = paymentService.findById(paymentId);
         log.info("GET /api/v1/payments/{paymentId} - findById response={}", response);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/{accountId}/debit-payments")
-    public ResponseEntity<?> findDebitPayments(@PathVariable UUID accountId, Pageable pageable) {
-        Page<PaymentResponse> response = paymentService.getDebitPayments(accountId, pageable);
-        log.info("GET /api/v1/payments/{accountId}/debit-payments - findDebitPayments response={}", response);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/{accountId}/credit-payments")
-    public ResponseEntity<?> findCreditPayments(@PathVariable UUID accountId, Pageable pageable) {
-        Page<PaymentResponse> response = paymentService.getCreditPayments(accountId, pageable);
-        log.info("GET /api/v1/payments/{accountId}/credit-payments - findCreditPayments response={}", response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

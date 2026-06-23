@@ -2,10 +2,9 @@ package kg.bakaibank.processingservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DialectOverride;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,4 +43,13 @@ public class Account {
 
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;
+
+    @Column(name = "opened_at")
+    private OffsetDateTime openedAt;
+
+    @Column(name = "closed_at")
+    private OffsetDateTime closedAt;
+
+    @Column(name = "ended_at")
+    private OffsetDateTime endedAt;
 }

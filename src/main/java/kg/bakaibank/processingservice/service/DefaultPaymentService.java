@@ -6,15 +6,16 @@ import kg.bakaibank.processingservice.entity.enums.PaymentDeclineReason;
 import kg.bakaibank.processingservice.entity.enums.PaymentStatus;
 import kg.bakaibank.processingservice.exception.custom.PaymentNotFoundException;
 import kg.bakaibank.processingservice.mapper.PaymentMapper;
+import kg.bakaibank.processingservice.payload.enums.PaymentAccountType;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.PaymentResponse;
+import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
 import kg.bakaibank.processingservice.repository.PaymentRepository;
 import kg.bakaibank.processingservice.service.api.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ThemeResolver;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -37,7 +38,7 @@ public class DefaultPaymentService implements PaymentService {
         payment.setDebitAccount(debitAccount);
         payment.setCreditAccount(creditAccount);
         payment.setStatus(PaymentStatus.NEW);
-        return payment;
+        return paymentRepository.save(payment);
     }
 
     @Override
@@ -70,15 +71,21 @@ public class DefaultPaymentService implements PaymentService {
     }
 
     @Override
-    public Page<PaymentResponse> getCreditPayments(UUID creditAccountId, Pageable pageable) {
-        return paymentRepository.findByCreditAccountId(creditAccountId, pageable)
-            .map(paymentMapper::toResponse);
-    }
+    public Page<PaymentShortResponse> getPayments(UUID accountId,
+                                                  Pageable pageable,
+                                                  PaymentAccountType type,
+                                                  OffsetDateTime from,
+                                                  OffsetDateTime to) {
+        Page<Payment> paymentPage;
 
-    @Override
-    public Page<PaymentResponse> getDebitPayments(UUID debitAccountId, Pageable pageable) {
-        return paymentRepository.findByDebitAccountId(debitAccountId, pageable)
-            .map(paymentMapper::toResponse);
+        if (type == PaymentAccountType.CREDIT) {
+            paymentPage = paymentRepository.findByCreditAccountId(accountId, from, to, pageable);
+        } else if (type == PaymentAccountType.DEBIT) {
+            paymentPage = paymentRepository.findByDebitAccountId(accountId, from, to, pageable);
+        } else {
+            paymentPage = paymentRepository.findByAccountId(accountId, from, to, pageable);
+        }
+        return paymentPage.map(paymentMapper::toShortResponse);
     }
 
     @Override

@@ -26,6 +26,7 @@ public class PaymentMapper {
         }
         return new PaymentShortResponse(
             payment.getId(),
+            payment.getAmount(),
             payment.getStatus(),
             payment.getDeclineReason());
     }

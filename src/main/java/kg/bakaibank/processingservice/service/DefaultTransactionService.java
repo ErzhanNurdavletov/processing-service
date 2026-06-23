@@ -1,6 +1,7 @@
 package kg.bakaibank.processingservice.service;
 
 import kg.bakaibank.processingservice.entity.Account;
+import kg.bakaibank.processingservice.entity.Payment;
 import kg.bakaibank.processingservice.entity.Transaction;
 import kg.bakaibank.processingservice.entity.enums.TransactionStatus;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
@@ -17,8 +18,10 @@ public class DefaultTransactionService implements TransactionService {
     @Override
     public Transaction initTransaction(PaymentRequest request,
                                        Account debitAccount,
-                                       Account creditAccount) {
+                                       Account creditAccount,
+                                       Payment payment) {
         return Transaction.builder()
+            .payment(payment)
             .debitAccount(debitAccount)
             .creditAccount(creditAccount)
             .amount(request.amount())

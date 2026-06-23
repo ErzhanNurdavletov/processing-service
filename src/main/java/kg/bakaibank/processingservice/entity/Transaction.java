@@ -44,4 +44,8 @@ public class Transaction {
 
     @Column(name = "comment")
     private String comment;
+
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 }

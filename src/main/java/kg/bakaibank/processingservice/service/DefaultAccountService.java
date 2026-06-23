@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
@@ -55,6 +56,8 @@ public class DefaultAccountService implements AccountService {
         });
         clientWebclient.checkIfClientByIdExists(request.clientId());
         Account account = accountMapper.toEntity(request);
+        account.setOpenedAt(OffsetDateTime.now());
+        account.setEndedAt(account.getOpenedAt().plusYears(3));
         account.setBalance(new BigDecimal(0));
         accountRepository.save(account);
         return accountMapper.toResponse(account);

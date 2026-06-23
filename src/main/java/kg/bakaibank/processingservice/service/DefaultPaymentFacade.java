@@ -1,9 +1,5 @@
 package kg.bakaibank.processingservice.service;
 
-//TODO разобраться с @Transactional в платежах
-//TODO привязывать счета к транзакциям и платежам ---
-//TODO считать для лимитом только те платежи которые COMPLETED или NEW
-
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.entity.Payment;
 import kg.bakaibank.processingservice.entity.Transaction;
@@ -64,7 +60,6 @@ public class DefaultPaymentFacade implements PaymentFacade {
         Account debitAccount = accountService.findByIdForUpdate(sourceCardResponse.accountId());
         Account creditAccount = accountService.findByIdForUpdate(destinationCardResponse.accountId());
         Payment payment = paymentService.openPayment(request, debitAccount, creditAccount);
-
         log.info("debitAccount {}", debitAccount);
         log.info("creditAccount {}", creditAccount);
         log.info("payment {}", payment);
@@ -82,12 +77,12 @@ public class DefaultPaymentFacade implements PaymentFacade {
 
         Account transitAccount = accountService.getBankTransitAccount();
         Transaction debitToTransitTransaction =
-            transactionService.initTransaction(request, debitAccount, transitAccount);
+            transactionService.initTransaction(request, debitAccount, transitAccount, payment);
         transferMoney(debitAccount, transitAccount, request.amount());
         transactionService.closeTransaction(debitToTransitTransaction);
 
         Transaction transitToCreditTransaction =
-            transactionService.initTransaction(request, transitAccount, creditAccount);
+            transactionService.initTransaction(request, transitAccount, creditAccount, payment);
         transferMoney(transitAccount, creditAccount, request.amount());
         transactionService.closeTransaction(transitToCreditTransaction);
 
@@ -109,7 +104,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
         log.info("debitAccountId {}", debitAccountId);
         BigDecimal sumForToday =
             paymentService.countTodayPaymentSum(debitAccountId).add(transferAmount);
-        int countForToday = paymentService.countTodayPayments(debitAccountId) + 1;
+        int countForToday = paymentService.countTodayPayments(debitAccountId); // здесь был инкремент
 
         log.info("sumForToday {}, countForToday {}", sumForToday, countForToday);
         RemotePaymentPermissionRequest remoteRequest =

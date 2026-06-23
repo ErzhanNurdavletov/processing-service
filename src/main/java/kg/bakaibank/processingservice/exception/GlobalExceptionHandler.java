@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -17,6 +18,34 @@ import java.util.List;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+
+        String customMessage = "Method argument Mismatch";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Allowed values for accountType @RequestParam are: DEBIT, CREDIT OR Null")
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RemoteLimitServiceException.class)
+    public ResponseEntity<?> handleRemoteLimitServiceException(RemoteLimitServiceException e) {
+
+        String customMessage = "Remote limit service exception";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<?> handlePropertyReferenceException(PropertyReferenceException e) {

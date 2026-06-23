@@ -1,16 +1,24 @@
 package kg.bakaibank.processingservice.controller;
 
 import jakarta.validation.Valid;
+import kg.bakaibank.processingservice.payload.enums.PaymentAccountType;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
+import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
 import kg.bakaibank.processingservice.service.api.AccountService;
+import kg.bakaibank.processingservice.service.api.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +27,7 @@ import java.util.UUID;
 @Slf4j
 public class AccountController {
     private final AccountService accountService;
+    private final PaymentService paymentService;
 
     @PostMapping
     public ResponseEntity<?> createAccount(@Valid @RequestBody AccountCreateRequest request) {
@@ -31,6 +40,19 @@ public class AccountController {
     public ResponseEntity<?> getBalance(@PathVariable UUID accountId) {
         AccountBalanceResponse response = accountService.getBalance(accountId);
         log.info("GET /api/v1/accounts/{accountId}/balance - getBalance response={}", response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{accountId}/payments-page")
+    public ResponseEntity<?> getPaymentsPage(@PathVariable UUID accountId,
+                                      @PageableDefault(sort = "createdAt",
+                                          direction = Sort.Direction.ASC) Pageable pageable,
+                                      @RequestParam(required = false) PaymentAccountType accountType,
+                                      @RequestParam OffsetDateTime from,
+                                      @RequestParam OffsetDateTime to) {
+        Page<PaymentShortResponse> response =
+            paymentService.getPayments(accountId, pageable, accountType, from, to);
+        log.info("GET /api/v1/accounts/{}/payments-page - getPaymentsPage response={}",accountId, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
