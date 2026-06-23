@@ -6,8 +6,10 @@ import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
 import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
+import kg.bakaibank.processingservice.payload.response.TransactionShortResponse;
 import kg.bakaibank.processingservice.service.api.AccountService;
 import kg.bakaibank.processingservice.service.api.PaymentService;
+import kg.bakaibank.processingservice.service.api.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,6 +30,7 @@ import java.util.UUID;
 public class AccountController {
     private final AccountService accountService;
     private final PaymentService paymentService;
+    private final TransactionService transactionService;
 
     @PostMapping
     public ResponseEntity<?> createAccount(@Valid @RequestBody AccountCreateRequest request) {
@@ -53,6 +56,18 @@ public class AccountController {
         Page<PaymentShortResponse> response =
             paymentService.getPayments(accountId, pageable, accountType, from, to);
         log.info("GET /api/v1/accounts/{}/payments-page - getPaymentsPage response={}",accountId, response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{accountId}/transactions-page")
+    public ResponseEntity<?> getTransactionsPage(@PathVariable UUID accountId,
+                                             @PageableDefault(sort = "createdAt",
+                                                 direction = Sort.Direction.ASC) Pageable pageable,
+                                             @RequestParam OffsetDateTime from,
+                                             @RequestParam OffsetDateTime to) {
+        Page<TransactionShortResponse> response =
+            transactionService.getTransactions(accountId, pageable, from, to);
+        log.info("GET /api/v1/accounts/{}/transactions-page - getTransactionsPage response={}",accountId, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

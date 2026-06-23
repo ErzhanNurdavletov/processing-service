@@ -6,6 +6,7 @@ import kg.bakaibank.processingservice.entity.enums.TransactionStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -48,4 +49,7 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;
+
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
 }
