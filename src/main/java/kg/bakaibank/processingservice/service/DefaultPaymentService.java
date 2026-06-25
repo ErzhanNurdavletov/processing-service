@@ -76,15 +76,11 @@ public class DefaultPaymentService implements PaymentService {
                                                   PaymentAccountType type,
                                                   OffsetDateTime from,
                                                   OffsetDateTime to) {
-        Page<Payment> paymentPage;
-
-        if (type == PaymentAccountType.CREDIT) {
-            paymentPage = paymentRepository.findByCreditAccountId(accountId, from, to, pageable);
-        } else if (type == PaymentAccountType.DEBIT) {
-            paymentPage = paymentRepository.findByDebitAccountId(accountId, from, to, pageable);
-        } else {
-            paymentPage = paymentRepository.findByAccountId(accountId, from, to, pageable);
-        }
+        Page<Payment> paymentPage = switch (type) {
+            case DEBIT -> paymentRepository.findByDebitAccountId(accountId, from, to, pageable);
+            case CREDIT -> paymentRepository.findByCreditAccountId(accountId, from, to, pageable);
+            case null -> paymentRepository.findByAccountId(accountId, from, to, pageable);
+        };
         return paymentPage.map(paymentMapper::toShortResponse);
     }
 

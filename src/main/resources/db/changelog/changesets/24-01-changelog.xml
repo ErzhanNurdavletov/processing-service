@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1782293365471-1" author="Эржан">
+        <createTable tableName="outboxes">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_outboxes"/>
+            </column>
+            <column name="payment_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="DECIMAL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_decline_reason" type="VARCHAR(255)"/>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_at" type="timestamp"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1782293365471-2" author="Эржан">
+        <addForeignKeyConstraint baseColumnNames="payment_id" baseTableName="outboxes"
+                                 constraintName="FK_OUTBOXES_ON_PAYMENT" referencedColumnNames="id"
+                                 referencedTableName="payments"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -9,10 +9,7 @@ import kg.bakaibank.processingservice.exception.custom.DefaultTransferLimitNotFo
 import kg.bakaibank.processingservice.mapper.PaymentMapper;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
-import kg.bakaibank.processingservice.service.api.AccountService;
-import kg.bakaibank.processingservice.service.api.PaymentFacade;
-import kg.bakaibank.processingservice.service.api.PaymentService;
-import kg.bakaibank.processingservice.service.api.TransactionService;
+import kg.bakaibank.processingservice.service.api.*;
 import kg.bakaibank.processingservice.webclient.CardWebClient;
 import kg.bakaibank.processingservice.webclient.payload.enums.CardStatus;
 import kg.bakaibank.processingservice.webclient.payload.request.RemotePaymentPermissionRequest;
@@ -37,6 +34,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
     private final PaymentService paymentService;
     private final AccountService accountService;
     private final TransactionService transactionService;
+    private final OutboxService outboxService;
     private final CardWebClient cardWebClient;
     private final PaymentMapper paymentMapper;
 
@@ -68,10 +66,12 @@ public class DefaultPaymentFacade implements PaymentFacade {
         boolean isLimitExceed = isCardLimitExceed(request.sourceCardId(), debitAccount.getId(), request.amount());
         if (!isMoneyEnough) {
             paymentService.declinePayment(payment, PaymentDeclineReason.INSUFFICIENT_FUNDS);
+            outboxService.createOutbox(payment);
             return paymentMapper.toShortResponse(payment);
         }
         if (isLimitExceed) {
             paymentService.declinePayment(payment, PaymentDeclineReason.LIMIT_EXCEEDED);
+            outboxService.createOutbox(payment);
             return paymentMapper.toShortResponse(payment);
         }
 
@@ -87,6 +87,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
         transactionService.closeTransaction(transitToCreditTransaction);
 
         paymentService.completePayment(payment);
+        outboxService.createOutbox(payment);
         return paymentMapper.toShortResponse(payment);
     }
 
