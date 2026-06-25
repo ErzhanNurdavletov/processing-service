@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -72,4 +73,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
         """)
     Page<Payment> findByAccountId(UUID accountId, OffsetDateTime from,
                                   OffsetDateTime to, Pageable pageable);
+
+    Optional<Payment> findByIdempotencyKey(UUID idempotencyKey);
 }

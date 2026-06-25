@@ -1,10 +1,10 @@
-package kg.bakaibank.processingservice.service;
+package kg.bakaibank.processingservice.service.implementation.service;
 
 import kg.bakaibank.processingservice.entity.Outbox;
 import kg.bakaibank.processingservice.entity.Payment;
 import kg.bakaibank.processingservice.entity.enums.PaymentStatus;
 import kg.bakaibank.processingservice.repository.OutboxRepository;
-import kg.bakaibank.processingservice.service.api.OutboxService;
+import kg.bakaibank.processingservice.service.api.service.OutboxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

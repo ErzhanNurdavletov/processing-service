@@ -14,6 +14,8 @@ public class PaymentMapper {
             return null;
         }
         return Payment.builder()
+            .destinationCardId(request.destinationCardId())
+            .sourceCardId(request.sourceCardId())
             .amount(request.amount())
             .currency(request.currency())
             .comment(request.comment())
@@ -40,6 +42,8 @@ public class PaymentMapper {
             payment.getId(),
             payment.getDebitAccount().getId(),
             payment.getCreditAccount().getId(),
+            payment.getSourceCardId(),
+            payment.getDestinationCardId(),
             payment.getAmount(),
             payment.getCurrency(),
             payment.getStatus(),

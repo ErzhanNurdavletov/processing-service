@@ -11,8 +11,8 @@ import java.util.List;
 public class ErrorResponse {
     private final OffsetDateTime timestamp;
     private final int status;
-    private final String error;
     private final String message;
+    private final String error;
     private final String path;
     private final List<ValidationError> validationErrors;
 }

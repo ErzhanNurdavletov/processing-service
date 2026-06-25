@@ -1,4 +1,4 @@
-package kg.bakaibank.processingservice.service;
+package kg.bakaibank.processingservice.service.implementation.service;
 
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.exception.custom.AccountNotFoundException;
@@ -8,7 +8,7 @@ import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
 import kg.bakaibank.processingservice.repository.AccountRepository;
-import kg.bakaibank.processingservice.service.api.AccountService;
+import kg.bakaibank.processingservice.service.api.service.AccountService;
 import kg.bakaibank.processingservice.webclient.ClientWebClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,9 +51,9 @@ public class DefaultAccountService implements AccountService {
     @Transactional
     @Override
     public AccountResponse createAccount(AccountCreateRequest request) {
-        accountRepository.findByClientId(request.clientId()).ifPresent((account) -> {
-            throw new AccountWithClientIdExistsException(request.clientId() + " client exists");
-        });
+//        accountRepository.findByClientId(request.clientId()).ifPresent((account) -> {
+//            throw new AccountWithClientIdExistsException(request.clientId() + " client exists");
+//        });
         clientWebclient.checkIfClientByIdExists(request.clientId());
         Account account = accountMapper.toEntity(request);
         account.setOpenedAt(OffsetDateTime.now());
@@ -67,5 +67,10 @@ public class DefaultAccountService implements AccountService {
     public AccountBalanceResponse getBalance(UUID accountId) {
         Account account = findById(accountId);
         return accountMapper.toBalanceResponse(account);
+    }
+
+    @Override
+    public boolean existsById(UUID accountId) {
+        return accountRepository.existsById(accountId);
     }
 }

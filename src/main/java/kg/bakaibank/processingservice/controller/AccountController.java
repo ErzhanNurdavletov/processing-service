@@ -7,9 +7,10 @@ import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
 import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
 import kg.bakaibank.processingservice.payload.response.TransactionShortResponse;
-import kg.bakaibank.processingservice.service.api.AccountService;
-import kg.bakaibank.processingservice.service.api.PaymentService;
-import kg.bakaibank.processingservice.service.api.TransactionService;
+import kg.bakaibank.processingservice.service.api.facade.AccountFacade;
+import kg.bakaibank.processingservice.service.api.service.AccountService;
+import kg.bakaibank.processingservice.service.api.service.PaymentService;
+import kg.bakaibank.processingservice.service.api.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,8 +30,7 @@ import java.util.UUID;
 @Slf4j
 public class AccountController {
     private final AccountService accountService;
-    private final PaymentService paymentService;
-    private final TransactionService transactionService;
+    private final AccountFacade accountFacade;
 
     @PostMapping
     public ResponseEntity<?> createAccount(@Valid @RequestBody AccountCreateRequest request) {
@@ -54,7 +54,7 @@ public class AccountController {
                                       @RequestParam OffsetDateTime from,
                                       @RequestParam OffsetDateTime to) {
         Page<PaymentShortResponse> response =
-            paymentService.getPayments(accountId, pageable, accountType, from, to);
+            accountFacade.getPayments(accountId, pageable, accountType, from, to);
         log.info("GET /api/v1/accounts/{}/payments-page - getPaymentsPage response={}",accountId, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -66,7 +66,7 @@ public class AccountController {
                                              @RequestParam OffsetDateTime from,
                                              @RequestParam OffsetDateTime to) {
         Page<TransactionShortResponse> response =
-            transactionService.getTransactions(accountId, pageable, from, to);
+            accountFacade.getTransactions(accountId, pageable, from, to);
         log.info("GET /api/v1/accounts/{}/transactions-page - getTransactionsPage response={}",accountId, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

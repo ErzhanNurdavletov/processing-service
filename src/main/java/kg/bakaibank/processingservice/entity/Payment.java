@@ -57,4 +57,13 @@ public class Payment {
 
     @OneToMany(mappedBy = "payment")
     private Set<Transaction> transactions;
+
+    @Column(name = "idempotency_key", unique = true)
+    private UUID idempotencyKey;
+
+    @Column(name = "source_card_id")
+    private UUID sourceCardId;
+
+    @Column(name = "destination_card_id")
+    private UUID destinationCardId;
 }

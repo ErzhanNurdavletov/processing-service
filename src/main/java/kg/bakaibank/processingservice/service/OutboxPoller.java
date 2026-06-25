@@ -2,7 +2,7 @@ package kg.bakaibank.processingservice.service;
 
 import kg.bakaibank.processingservice.entity.Outbox;
 import kg.bakaibank.processingservice.mapper.OutboxMapper;
-import kg.bakaibank.processingservice.service.api.OutboxService;
+import kg.bakaibank.processingservice.service.api.service.OutboxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,4 +1,4 @@
-package kg.bakaibank.processingservice.service.api;
+package kg.bakaibank.processingservice.service.api.service;
 
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
@@ -13,4 +13,5 @@ public interface AccountService {
     Account getBankTransitAccount();
     AccountResponse createAccount(AccountCreateRequest request);
     AccountBalanceResponse getBalance(UUID accountId);
+    boolean existsById(UUID accountId);
 }

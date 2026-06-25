@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -19,6 +21,48 @@ import java.util.List;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+
+        String customMessage = "Missing request params:";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IdempotencyKeyExistsException.class)
+    public ResponseEntity<?> handleIdempotencyKeyExistsException(IdempotencyKeyExistsException e) {
+
+        String customMessage = "Idempotency-Key exists for another payment";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<?> handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+
+        String customMessage = "Missing Request Header";
+        ErrorResponse response = ErrorResponse.builder()
+            .message(customMessage)
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.info("{}, message: {}",customMessage, e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
 
@@ -26,7 +70,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.builder()
             .message(customMessage)
             .status(HttpStatus.BAD_REQUEST.value())
-            .error("Allowed values for accountType @RequestParam are: DEBIT, CREDIT OR Null")
+            .error(e.getMessage())
             .timestamp(OffsetDateTime.now())
             .build();
         log.info("{}, message: {}",customMessage, e.getMessage());

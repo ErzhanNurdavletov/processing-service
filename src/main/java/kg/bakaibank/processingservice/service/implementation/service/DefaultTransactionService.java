@@ -1,4 +1,4 @@
-package kg.bakaibank.processingservice.service;
+package kg.bakaibank.processingservice.service.implementation.service;
 
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.entity.Payment;
@@ -8,7 +8,7 @@ import kg.bakaibank.processingservice.mapper.TransactionMapper;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.TransactionShortResponse;
 import kg.bakaibank.processingservice.repository.TransactionRepository;
-import kg.bakaibank.processingservice.service.api.TransactionService;
+import kg.bakaibank.processingservice.service.api.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

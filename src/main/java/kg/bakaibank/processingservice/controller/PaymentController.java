@@ -4,8 +4,8 @@ import jakarta.validation.Valid;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.PaymentResponse;
 import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
-import kg.bakaibank.processingservice.service.api.PaymentFacade;
-import kg.bakaibank.processingservice.service.api.PaymentService;
+import kg.bakaibank.processingservice.service.api.facade.PaymentFacade;
+import kg.bakaibank.processingservice.service.api.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,8 +24,9 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<?> executePayment(@Valid @RequestBody PaymentRequest request) {
-        PaymentShortResponse response = paymentFacade.executePayment(request);
+    public ResponseEntity<?> executePayment(@RequestHeader(name = "Idempotency-Key") UUID idempotencyKey,
+                                            @Valid @RequestBody PaymentRequest request) {
+        PaymentShortResponse response = paymentFacade.executePayment(request, idempotencyKey);
         log.info("POST /api/v1/payments - executePayment response={}", response);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

@@ -1,4 +1,4 @@
-package kg.bakaibank.processingservice.service;
+package kg.bakaibank.processingservice.service.implementation.facade;
 
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.entity.Payment;
@@ -6,10 +6,15 @@ import kg.bakaibank.processingservice.entity.Transaction;
 import kg.bakaibank.processingservice.entity.enums.PaymentDeclineReason;
 import kg.bakaibank.processingservice.exception.custom.CardIsBlockedException;
 import kg.bakaibank.processingservice.exception.custom.DefaultTransferLimitNotFoundException;
+import kg.bakaibank.processingservice.exception.custom.IdempotencyKeyExistsException;
 import kg.bakaibank.processingservice.mapper.PaymentMapper;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
-import kg.bakaibank.processingservice.service.api.*;
+import kg.bakaibank.processingservice.service.api.facade.PaymentFacade;
+import kg.bakaibank.processingservice.service.api.service.AccountService;
+import kg.bakaibank.processingservice.service.api.service.OutboxService;
+import kg.bakaibank.processingservice.service.api.service.PaymentService;
+import kg.bakaibank.processingservice.service.api.service.TransactionService;
 import kg.bakaibank.processingservice.webclient.CardWebClient;
 import kg.bakaibank.processingservice.webclient.payload.enums.CardStatus;
 import kg.bakaibank.processingservice.webclient.payload.request.RemotePaymentPermissionRequest;
@@ -24,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,8 +50,18 @@ public class DefaultPaymentFacade implements PaymentFacade {
         timeout = 15,
         rollbackFor = Exception.class
     )
-    public PaymentShortResponse executePayment(PaymentRequest request) {
+    public PaymentShortResponse executePayment(PaymentRequest request, UUID idempotencyKey) {
         log.info("request {}", request);
+        log.info("idempotencyKey {}", idempotencyKey);
+        Optional<Payment> existsPayment = paymentService.findByIdempotencyKey(idempotencyKey);
+        if (existsPayment.isPresent()) {
+            if (!paymentService.isRequestEqualsPayment(request, existsPayment.get())) {
+                throw new IdempotencyKeyExistsException(
+                    "Idempotency-Key: " + idempotencyKey
+                        + " exists for payment with id: " + existsPayment.get().getId());
+            }
+            return paymentMapper.toShortResponse(existsPayment.get());
+        }
         RemoteCardResponse sourceCardResponse =
             cardWebClient.getCardById(request.sourceCardId());
         RemoteCardResponse destinationCardResponse =
@@ -57,7 +73,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
 
         Account debitAccount = accountService.findByIdForUpdate(sourceCardResponse.accountId());
         Account creditAccount = accountService.findByIdForUpdate(destinationCardResponse.accountId());
-        Payment payment = paymentService.openPayment(request, debitAccount, creditAccount);
+        Payment payment = paymentService.openPayment(request, debitAccount, creditAccount, idempotencyKey);
         log.info("debitAccount {}", debitAccount);
         log.info("creditAccount {}", creditAccount);
         log.info("payment {}", payment);

@@ -1,4 +1,4 @@
-package kg.bakaibank.processingservice.service.api;
+package kg.bakaibank.processingservice.service.api.service;
 
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.entity.Payment;

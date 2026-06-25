@@ -12,6 +12,8 @@ public record PaymentResponse(
     UUID id,
     UUID debitAccountId,
     UUID creditAccountId,
+    UUID sourceCardId,
+    UUID destinationCardId,
     BigDecimal amount,
     PaymentCurrency currency,
     PaymentStatus status,
