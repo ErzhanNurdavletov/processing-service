@@ -62,10 +62,8 @@ public class DefaultPaymentFacade implements PaymentFacade {
             }
             return paymentMapper.toShortResponse(existsPayment.get());
         }
-        RemoteCardResponse sourceCardResponse =
-            cardWebClient.getCardById(request.sourceCardId());
-        RemoteCardResponse destinationCardResponse =
-            cardWebClient.getCardById(request.destinationCardId());
+        RemoteCardResponse sourceCardResponse = cardWebClient.getCardById(request.sourceCardId());
+        RemoteCardResponse destinationCardResponse = cardWebClient.getCardById(request.destinationCardId());
         log.info("sourceCardResponse {}", sourceCardResponse);
         log.info("destinationCardResponse {}", destinationCardResponse);
         checkIfCardBlocked(sourceCardResponse);
