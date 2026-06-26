@@ -46,7 +46,6 @@ public class DefaultPaymentFacade implements PaymentFacade {
 
     @Override
     @Transactional(
-        isolation = Isolation.SERIALIZABLE,
         timeout = 15,
         rollbackFor = Exception.class
     )
@@ -70,19 +69,20 @@ public class DefaultPaymentFacade implements PaymentFacade {
         checkIfCardBlocked(destinationCardResponse);
 
         Account debitAccount = accountService.findByIdForUpdate(sourceCardResponse.accountId());
-        Account creditAccount = accountService.findByIdForUpdate(destinationCardResponse.accountId());
+        Account creditAccount = accountService.findById(destinationCardResponse.accountId());
         Payment payment = paymentService.openPayment(request, debitAccount, creditAccount, idempotencyKey);
         log.info("debitAccount {}", debitAccount);
         log.info("creditAccount {}", creditAccount);
         log.info("payment {}", payment);
 
         boolean isMoneyEnough = isDebitMoneyEnough(debitAccount, request.amount());
-        boolean isLimitExceed = isCardLimitExceed(request.sourceCardId(), debitAccount.getId(), request.amount());
         if (!isMoneyEnough) {
             paymentService.declinePayment(payment, PaymentDeclineReason.INSUFFICIENT_FUNDS);
             outboxService.createOutbox(payment);
             return paymentMapper.toShortResponse(payment);
         }
+
+        boolean isLimitExceed = isCardLimitExceed(request.sourceCardId(), debitAccount.getId(), request.amount());
         if (isLimitExceed) {
             paymentService.declinePayment(payment, PaymentDeclineReason.LIMIT_EXCEEDED);
             outboxService.createOutbox(payment);
@@ -102,6 +102,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
 
         paymentService.completePayment(payment);
         outboxService.createOutbox(payment);
+        log.info("payment {}", payment);
         return paymentMapper.toShortResponse(payment);
     }
 

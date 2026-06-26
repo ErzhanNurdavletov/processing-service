@@ -45,7 +45,7 @@ public class DefaultAccountService implements AccountService {
 
     @Override
     public Account getBankTransitAccount() {
-        return findByIdForUpdate(BANK_TRANSIT_ACCOUNT_ID);
+        return findById(BANK_TRANSIT_ACCOUNT_ID);
     }
 
     @Transactional

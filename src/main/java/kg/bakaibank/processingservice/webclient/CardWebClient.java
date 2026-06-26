@@ -42,6 +42,11 @@ public class CardWebClient {
             .uri("/cards/{cardId}/current-limits", cardId)
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
+            .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
+                .flatMap(errorBody -> Mono.error(new RemoteLimitServiceException(
+                    errorBody.getMessage(),
+                    HttpStatus.resolve(errorBody.getStatus())
+                ))))
             .bodyToFlux(RemoteCardLimitResponse.class)
             .collectList()
             .block();
@@ -55,6 +60,11 @@ public class CardWebClient {
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(request)
             .retrieve()
+            .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
+                .flatMap(errorBody -> Mono.error(new RemoteLimitServiceException(
+                    errorBody.getMessage(),
+                    HttpStatus.resolve(errorBody.getStatus())
+                ))))
             .bodyToMono(RemotePaymentPermissionResponse.class)
             .block();
     }
