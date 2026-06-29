@@ -56,8 +56,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
         if (existsPayment.isPresent()) {
             if (!paymentService.isRequestEqualsPayment(request, existsPayment.get())) {
                 throw new IdempotencyKeyExistsException(
-                    "Idempotency-Key: " + idempotencyKey
-                        + " exists for payment with id: " + existsPayment.get().getId());
+                    "Idempotency-Key: " + idempotencyKey + " exists");
             }
             return paymentMapper.toShortResponse(existsPayment.get());
         }
@@ -69,7 +68,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
         checkIfCardBlocked(destinationCardResponse);
 
         Account debitAccount = accountService.findByIdForUpdate(sourceCardResponse.accountId());
-        Account creditAccount = accountService.findById(destinationCardResponse.accountId());
+        Account creditAccount = accountService.findByIdForUpdate(destinationCardResponse.accountId());
         Payment payment = paymentService.openPayment(request, debitAccount, creditAccount, idempotencyKey);
         log.info("debitAccount {}", debitAccount);
         log.info("creditAccount {}", creditAccount);
@@ -77,7 +76,9 @@ public class DefaultPaymentFacade implements PaymentFacade {
 
         boolean isMoneyEnough = isDebitMoneyEnough(debitAccount, request.amount());
         if (!isMoneyEnough) {
+            log.info("INSUFFICIENT_FUNDS for card with id: {}", request.sourceCardId());
             paymentService.declinePayment(payment, PaymentDeclineReason.INSUFFICIENT_FUNDS);
+            log.info("saved declined payment with id: {}", payment.getId());
             outboxService.createOutbox(payment);
             return paymentMapper.toShortResponse(payment);
         }
@@ -102,7 +103,7 @@ public class DefaultPaymentFacade implements PaymentFacade {
 
         paymentService.completePayment(payment);
         outboxService.createOutbox(payment);
-        log.info("payment {}", payment);
+        log.info("payment before returning response: {}", payment);
         return paymentMapper.toShortResponse(payment);
     }
 

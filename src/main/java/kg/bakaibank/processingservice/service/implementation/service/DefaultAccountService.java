@@ -45,15 +45,12 @@ public class DefaultAccountService implements AccountService {
 
     @Override
     public Account getBankTransitAccount() {
-        return findById(BANK_TRANSIT_ACCOUNT_ID);
+        return findByIdForUpdate(BANK_TRANSIT_ACCOUNT_ID);
     }
 
     @Transactional
     @Override
     public AccountResponse createAccount(AccountCreateRequest request) {
-//        accountRepository.findByClientId(request.clientId()).ifPresent((account) -> {
-//            throw new AccountWithClientIdExistsException(request.clientId() + " client exists");
-//        });
         clientWebclient.checkIfClientByIdExists(request.clientId());
         Account account = accountMapper.toEntity(request);
         account.setOpenedAt(OffsetDateTime.now());
