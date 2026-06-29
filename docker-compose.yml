@@ -4,9 +4,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://localhost:5434/payment_db"
-      SPRING_DATASOURCE_USERNAME: "user"
-      SPRING_DATASOURCE_PASSWORD: "pass"
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     depends_on:
       - postgres
 
