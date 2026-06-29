@@ -2,7 +2,6 @@ package kg.bakaibank.processingservice.service.implementation.service;
 
 import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.exception.custom.AccountNotFoundException;
-import kg.bakaibank.processingservice.exception.custom.AccountWithClientIdExistsException;
 import kg.bakaibank.processingservice.mapper.AccountMapper;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
