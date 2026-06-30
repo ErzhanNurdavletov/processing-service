@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: enurdavletov/processing-service:latest
     ports:
       - "8081:8081"
     environment:
