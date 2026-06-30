@@ -13,4 +13,9 @@ public class PingPongController {
     public ResponseEntity<?> ping() {
         return new ResponseEntity<>("pong", HttpStatus.OK);
     }
+
+    @GetMapping("/a")
+    public ResponseEntity<?> b() {
+        return new ResponseEntity<>("b", HttpStatus.OK);
+    }
 }
