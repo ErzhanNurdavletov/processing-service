@@ -9,7 +9,11 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "accounts")
+@Table(name = "accounts",
+    indexes = {
+    @Index(name = "idx_accounts_client_id", columnList = "client_id")
+    }
+)
 @Getter
 @Setter
 @Builder
@@ -35,7 +39,7 @@ public class Account {
     @OneToMany(mappedBy = "debitAccount")
     private Set<Transaction> debitTransactions;
 
-    @Column(name = "client_id", nullable = false, unique = true)
+    @Column(name = "client_id", nullable = false)
     private UUID clientId;
 
     @Column(name = "account_number", nullable = false, unique = true, length = 22)

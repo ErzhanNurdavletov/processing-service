@@ -12,7 +12,13 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payments",
+    indexes = {
+    @Index(name = "idx_payments_debit_account_id", columnList = "debit_account_id"),
+    @Index(name = "idx_payments_credit_account_id", columnList = "credit_account_id"),
+    @Index(name = "idx_payments_created_at", columnList = "created_at")
+    }
+)
 @Getter
 @Setter
 @Builder

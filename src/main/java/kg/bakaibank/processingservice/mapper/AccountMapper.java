@@ -4,6 +4,7 @@ import kg.bakaibank.processingservice.entity.Account;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
+import kg.bakaibank.processingservice.payload.response.AccountShortResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,11 +20,11 @@ public class AccountMapper {
             .build();
     }
 
-    public AccountResponse toResponse(Account account) {
+    public AccountShortResponse toShortResponse(Account account) {
         if (account == null) {
             return null;
         }
-        return new AccountResponse(account.getId());
+        return new AccountShortResponse(account.getId());
     }
 
     public AccountBalanceResponse toBalanceResponse(Account account) {
@@ -33,5 +34,19 @@ public class AccountMapper {
         return new AccountBalanceResponse(
             account.getId(),
             account.getBalance());
+    }
+
+    public AccountResponse toResponse(Account account) {
+        if (account == null) {
+            return null;
+        }
+        return new AccountResponse(
+            account.getId(),
+            account.getClientId(),
+            account.getAccountNumber(),
+            account.getBalance(),
+            account.getOpenedAt(),
+            account.getClosedAt(),
+            account.getEndedAt());
     }
 }

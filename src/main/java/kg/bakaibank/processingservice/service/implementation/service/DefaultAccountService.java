@@ -5,7 +5,9 @@ import kg.bakaibank.processingservice.exception.custom.AccountNotFoundException;
 import kg.bakaibank.processingservice.mapper.AccountMapper;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.AccountBalanceResponse;
+import kg.bakaibank.processingservice.payload.response.AccountExistsResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
+import kg.bakaibank.processingservice.payload.response.AccountShortResponse;
 import kg.bakaibank.processingservice.repository.AccountRepository;
 import kg.bakaibank.processingservice.service.api.service.AccountService;
 import kg.bakaibank.processingservice.webclient.ClientWebClient;
@@ -49,14 +51,14 @@ public class DefaultAccountService implements AccountService {
 
     @Transactional
     @Override
-    public AccountResponse createAccount(AccountCreateRequest request) {
+    public AccountShortResponse createAccount(AccountCreateRequest request) {
         clientWebclient.checkIfClientByIdExists(request.clientId());
         Account account = accountMapper.toEntity(request);
         account.setOpenedAt(OffsetDateTime.now());
         account.setEndedAt(account.getOpenedAt().plusYears(3));
         account.setBalance(new BigDecimal(0));
         accountRepository.save(account);
-        return accountMapper.toResponse(account);
+        return accountMapper.toShortResponse(account);
     }
 
     @Override
@@ -68,5 +70,15 @@ public class DefaultAccountService implements AccountService {
     @Override
     public boolean existsById(UUID accountId) {
         return accountRepository.existsById(accountId);
+    }
+
+    @Override
+    public AccountExistsResponse existsByIdToResponse(UUID accountId) {
+        return new AccountExistsResponse(accountRepository.existsById(accountId));
+    }
+
+    @Override
+    public AccountResponse findByIdToResponse(UUID accountId) {
+        return accountMapper.toResponse(findById(accountId));
     }
 }

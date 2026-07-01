@@ -10,7 +10,11 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "transactions",
+    indexes = {
+        @Index(name = "idx_transactions_payment_id", columnList = "payment_id")
+    }
+)
 @Getter
 @Setter
 @Builder
