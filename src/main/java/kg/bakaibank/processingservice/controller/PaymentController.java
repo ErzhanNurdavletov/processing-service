@@ -1,6 +1,7 @@
 package kg.bakaibank.processingservice.controller;
 
 import jakarta.validation.Valid;
+import kg.bakaibank.processingservice.controller.api.PaymentControllerApi;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.PaymentResponse;
 import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
@@ -18,13 +19,13 @@ import java.util.UUID;
 @RequestMapping("api/v1/payments")
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentController {
+public class PaymentController implements PaymentControllerApi {
 
     private final PaymentFacade paymentFacade;
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<?> executePayment(@RequestHeader(name = "Idempotency-Key") UUID idempotencyKey,
+    public ResponseEntity<PaymentShortResponse> executePayment(@RequestHeader(name = "Idempotency-Key") UUID idempotencyKey,
                                             @Valid @RequestBody PaymentRequest request) {
         PaymentShortResponse response = paymentFacade.executePayment(request, idempotencyKey);
         log.info("POST /api/v1/payments - executePayment response={}", response);
@@ -32,7 +33,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{paymentId}")
-    public ResponseEntity<?> findById(@PathVariable UUID paymentId) {
+    public ResponseEntity<PaymentResponse> findById(@PathVariable UUID paymentId) {
         PaymentResponse response = paymentService.findById(paymentId);
         log.info("GET /api/v1/payments/{paymentId} - findById response={}", response);
         return ResponseEntity.status(HttpStatus.OK).body(response);

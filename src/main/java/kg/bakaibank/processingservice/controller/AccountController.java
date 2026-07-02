@@ -1,6 +1,7 @@
 package kg.bakaibank.processingservice.controller;
 
 import jakarta.validation.Valid;
+import kg.bakaibank.processingservice.controller.api.AccountControllerApi;
 import kg.bakaibank.processingservice.payload.enums.PaymentAccountType;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
 import kg.bakaibank.processingservice.payload.response.*;
@@ -23,26 +24,29 @@ import java.util.UUID;
 @RequestMapping("api/v1/accounts")
 @RequiredArgsConstructor
 @Slf4j
-public class AccountController {
+public class AccountController implements AccountControllerApi {
     private final AccountService accountService;
     private final AccountFacade accountFacade;
 
     @PostMapping
-    public ResponseEntity<?> createAccount(@Valid @RequestBody AccountCreateRequest request) {
+    @Override
+    public ResponseEntity<AccountShortResponse> createAccount(@Valid @RequestBody AccountCreateRequest request) {
         AccountShortResponse response = accountService.createAccount(request);
         log.info("POST /api/v1/accounts - createAccount response={}", response);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{accountId}/balance")
-    public ResponseEntity<?> getBalance(@PathVariable UUID accountId) {
+    @Override
+    public ResponseEntity<AccountBalanceResponse> getBalance(@PathVariable UUID accountId) {
         AccountBalanceResponse response = accountService.getBalance(accountId);
         log.info("GET /api/v1/accounts/{accountId}/balance - getBalance response={}", response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{accountId}/payments-page")
-    public ResponseEntity<?> getPaymentsPage(@PathVariable UUID accountId,
+    @Override
+    public ResponseEntity<Page<PaymentShortResponse>> getPaymentsPage(@PathVariable UUID accountId,
                                       @PageableDefault(sort = "createdAt",
                                           direction = Sort.Direction.ASC) Pageable pageable,
                                       @RequestParam(required = false) PaymentAccountType accountType,
@@ -55,7 +59,8 @@ public class AccountController {
     }
 
     @GetMapping("/{accountId}/transactions-page")
-    public ResponseEntity<?> getTransactionsPage(@PathVariable UUID accountId,
+    @Override
+    public ResponseEntity<Page<TransactionShortResponse>> getTransactionsPage(@PathVariable UUID accountId,
                                              @PageableDefault(sort = "createdAt",
                                                  direction = Sort.Direction.ASC) Pageable pageable,
                                              @RequestParam OffsetDateTime from,
@@ -67,14 +72,16 @@ public class AccountController {
     }
 
     @GetMapping("/{accountId}/exists")
-    public ResponseEntity<?> doesAccountExist(@PathVariable UUID accountId) {
+    @Override
+    public ResponseEntity<AccountExistsResponse> doesAccountExist(@PathVariable UUID accountId) {
         AccountExistsResponse response = accountService.existsByIdToResponse(accountId);
         log.info("GET /api/v1/accounts/{}/exists - doesAccountExist response={}",accountId, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{accountId}")
-    public ResponseEntity<?> findById(@PathVariable UUID accountId) {
+    @Override
+    public ResponseEntity<AccountResponse> findById(@PathVariable UUID accountId) {
         AccountResponse response = accountService.findByIdToResponse(accountId);
         log.info("GET /api/v1/accounts/{} - findById response={}",accountId, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -26,7 +26,7 @@ public class ClientWebClient {
             .retrieve()
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
                 .flatMap(errorBody -> Mono.error(new RemoteLimitServiceException(
-                    errorBody.getMessage(),
+                    errorBody.getError(),
                     HttpStatus.resolve(errorBody.getStatus())
                 ))))
             .bodyToMono(RemoteClientResponse.class)

@@ -30,7 +30,7 @@ public class CardWebClient {
             .retrieve()
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
                 .flatMap(errorBody -> Mono.error(new RemoteLimitServiceException(
-                    errorBody.getMessage(),
+                    errorBody.getError(),
                     HttpStatus.resolve(errorBody.getStatus())
                 ))))
             .bodyToMono(RemoteCardResponse.class)
@@ -44,7 +44,7 @@ public class CardWebClient {
             .retrieve()
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
                 .flatMap(errorBody -> Mono.error(new RemoteLimitServiceException(
-                    errorBody.getMessage(),
+                    errorBody.getError(),
                     HttpStatus.resolve(errorBody.getStatus())
                 ))))
             .bodyToFlux(RemoteCardLimitResponse.class)
@@ -62,7 +62,7 @@ public class CardWebClient {
             .retrieve()
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
                 .flatMap(errorBody -> Mono.error(new RemoteLimitServiceException(
-                    errorBody.getMessage(),
+                    errorBody.getError(),
                     HttpStatus.resolve(errorBody.getStatus())
                 ))))
             .bodyToMono(RemotePaymentPermissionResponse.class)
