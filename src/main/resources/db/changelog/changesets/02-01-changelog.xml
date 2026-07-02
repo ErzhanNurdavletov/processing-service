@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="sequence-for-account-numbers-1" author="Эржан">
+        <createSequence sequenceName="accounts_numbers_sequence"
+                        startValue="1"
+                        incrementBy="1"
+                        minValue="1"
+                        maxValue="9999999"
+                        cycle="false"
+        />
+
+    </changeSet>
+</databaseChangeLog>

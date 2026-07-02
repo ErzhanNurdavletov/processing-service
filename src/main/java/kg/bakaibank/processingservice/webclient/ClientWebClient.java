@@ -19,8 +19,8 @@ public class ClientWebClient {
 
     private final WebClient webClient;
 
-    public void checkIfClientByIdExists(UUID clientId) {
-        webClient.get()
+    public RemoteClientResponse findClientByIdExists(UUID clientId) {
+        return webClient.get()
             .uri("/clients/{clientId}", clientId)
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()

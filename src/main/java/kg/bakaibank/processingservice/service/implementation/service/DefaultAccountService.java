@@ -1,6 +1,7 @@
 package kg.bakaibank.processingservice.service.implementation.service;
 
 import kg.bakaibank.processingservice.entity.Account;
+import kg.bakaibank.processingservice.entity.enums.PaymentCurrency;
 import kg.bakaibank.processingservice.exception.custom.AccountNotFoundException;
 import kg.bakaibank.processingservice.mapper.AccountMapper;
 import kg.bakaibank.processingservice.payload.request.AccountCreateRequest;
@@ -9,8 +10,10 @@ import kg.bakaibank.processingservice.payload.response.AccountExistsResponse;
 import kg.bakaibank.processingservice.payload.response.AccountResponse;
 import kg.bakaibank.processingservice.payload.response.AccountShortResponse;
 import kg.bakaibank.processingservice.repository.AccountRepository;
+import kg.bakaibank.processingservice.service.api.AccountNumberGenerator;
 import kg.bakaibank.processingservice.service.api.service.AccountService;
 import kg.bakaibank.processingservice.webclient.ClientWebClient;
+import kg.bakaibank.processingservice.webclient.payload.response.RemoteClientResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,7 @@ public class DefaultAccountService implements AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final ClientWebClient clientWebclient;
+    private final AccountNumberGenerator accountNumberGenerator;
 
     @Override
     public Account findById(UUID accountId) {
@@ -52,8 +56,10 @@ public class DefaultAccountService implements AccountService {
     @Transactional
     @Override
     public AccountShortResponse createAccount(AccountCreateRequest request) {
-        clientWebclient.checkIfClientByIdExists(request.clientId());
+        RemoteClientResponse remoteResponse = clientWebclient.findClientByIdExists(request.clientId());
+        String accountNumber = accountNumberGenerator.generate(remoteResponse.type(), PaymentCurrency.SOM);
         Account account = accountMapper.toEntity(request);
+        account.setAccountNumber(accountNumber);
         account.setOpenedAt(OffsetDateTime.now());
         account.setEndedAt(account.getOpenedAt().plusYears(3));
         account.setBalance(new BigDecimal(0));

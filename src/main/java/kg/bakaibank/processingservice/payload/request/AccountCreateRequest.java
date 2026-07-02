@@ -12,13 +12,13 @@ public record AccountCreateRequest(
     @Schema(description = "clientId who account will belong to",
         requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "clientId can't be null")
-    UUID clientId,
+    UUID clientId
 
-    @Schema(description = "Unique number of account",
-        requiredMode = Schema.RequiredMode.REQUIRED, maxLength = 22)
-    @NotNull(message = "accountNumber can't be null")
-    @Pattern(regexp = "^\\d{22}$",
-        message = "accountNumber must be unique, 22 digit length")
-    String accountNumber
+//    @Schema(description = "Unique number of account",
+//        requiredMode = Schema.RequiredMode.REQUIRED, maxLength = 22)
+//    @NotNull(message = "accountNumber can't be null")
+//    @Pattern(regexp = "^\\d{22}$",
+//        message = "accountNumber must be unique, 22 digit length")
+//    String accountNumber
 ) {
 }

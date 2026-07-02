@@ -16,7 +16,6 @@ public class AccountMapper {
         }
         return Account.builder()
             .clientId(request.clientId())
-            .accountNumber(request.accountNumber())
             .build();
     }
 
@@ -24,7 +23,8 @@ public class AccountMapper {
         if (account == null) {
             return null;
         }
-        return new AccountShortResponse(account.getId());
+        return new AccountShortResponse(account.getId(),
+            account.getAccountNumber());
     }
 
     public AccountBalanceResponse toBalanceResponse(Account account) {

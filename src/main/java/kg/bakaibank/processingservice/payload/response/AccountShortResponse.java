@@ -6,6 +6,7 @@ import java.util.UUID;
 
 @Schema(description = "Response of short info of account")
 public record AccountShortResponse(
-    UUID accountId
+    UUID accountId,
+    String accountNumber
 ) {
 }
