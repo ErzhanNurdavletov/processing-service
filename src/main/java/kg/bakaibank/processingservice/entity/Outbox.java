@@ -22,7 +22,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "paymentStatus", "amount", "createdAt"})
+@ToString(of = {"id", "paymentStatus", "amount",
+    "paymentDeclineReason", "createdAt", "publishedAt"})
 public class Outbox {
 
     @Id

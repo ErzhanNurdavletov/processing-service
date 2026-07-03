@@ -25,7 +25,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "amount", "status", "declineReason"})
+@ToString(of = {"id", "amount", "currency", "status",
+    "declineReason", "idempotencyKey", "sourceCardId", "destinationCardId"})
 public class Payment {
 
     @Id
