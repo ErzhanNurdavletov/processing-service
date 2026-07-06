@@ -7,7 +7,7 @@ import kg.bakaibank.processingservice.entity.enums.PaymentStatus;
 import kg.bakaibank.processingservice.payload.request.PaymentRequest;
 import kg.bakaibank.processingservice.payload.response.PaymentShortResponse;
 import kg.bakaibank.processingservice.repository.AccountRepository;
-import kg.bakaibank.processingservice.webclient.CardWebClient;
+import kg.bakaibank.processingservice.webclient.cardlimitservice.CardWebClient;
 import kg.bakaibank.processingservice.webclient.payload.enums.CardStatus;
 import kg.bakaibank.processingservice.webclient.payload.response.RemoteCardLimitResponse;
 import kg.bakaibank.processingservice.webclient.payload.response.RemoteCardResponse;

@@ -12,7 +12,7 @@ import kg.bakaibank.processingservice.payload.response.AccountShortResponse;
 import kg.bakaibank.processingservice.repository.AccountRepository;
 import kg.bakaibank.processingservice.service.api.AccountNumberGenerator;
 import kg.bakaibank.processingservice.service.api.service.AccountService;
-import kg.bakaibank.processingservice.webclient.ClientWebClient;
+import kg.bakaibank.processingservice.webclient.cardlimitservice.ClientWebClient;
 import kg.bakaibank.processingservice.webclient.payload.response.RemoteClientResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

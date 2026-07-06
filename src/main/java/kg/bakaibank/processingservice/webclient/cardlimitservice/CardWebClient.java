@@ -1,4 +1,4 @@
-package kg.bakaibank.processingservice.webclient;
+package kg.bakaibank.processingservice.webclient.cardlimitservice;
 
 import kg.bakaibank.processingservice.exception.ErrorResponse;
 import kg.bakaibank.processingservice.exception.custom.RemoteLimitServiceException;

@@ -15,7 +15,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OutboxPoller {
+public class OutboxPollWorker {
 
     private final OutboxService outboxService;
     private final OutboxEventProducer outboxEventProducer;
@@ -24,8 +24,10 @@ public class OutboxPoller {
     @Scheduled(fixedDelay = 20_000L)
     public void pollUnpublishedOutboxes() {
         Set<Outbox> outboxes = outboxService.findAllNotPublished();
+
         OffsetDateTime now = OffsetDateTime.now();
         outboxes.forEach(outbox -> outbox.setPublishedAt(now));
+
         List<Outbox> outboxList = outboxService.saveAll(outboxes);
         outboxList.stream()
             .map(outboxMapper::toEvent)

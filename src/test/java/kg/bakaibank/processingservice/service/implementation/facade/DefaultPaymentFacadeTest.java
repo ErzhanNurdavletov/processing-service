@@ -13,7 +13,7 @@ import kg.bakaibank.processingservice.service.api.service.AccountService;
 import kg.bakaibank.processingservice.service.api.service.OutboxService;
 import kg.bakaibank.processingservice.service.api.service.PaymentService;
 import kg.bakaibank.processingservice.service.api.service.TransactionService;
-import kg.bakaibank.processingservice.webclient.CardWebClient;
+import kg.bakaibank.processingservice.webclient.cardlimitservice.CardWebClient;
 import kg.bakaibank.processingservice.webclient.payload.enums.CardStatus;
 import kg.bakaibank.processingservice.webclient.payload.request.RemotePaymentPermissionRequest;
 import kg.bakaibank.processingservice.webclient.payload.response.RemoteCardLimitResponse;
